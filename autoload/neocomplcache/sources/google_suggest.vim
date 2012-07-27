@@ -4,7 +4,7 @@ let s:source = {
             \ }
 
 call zlib#rc#set_default({
-            \ 'g:neco_source_google_suggest_enable'               : 0,
+            \ 'g:neco_source_google_suggest_disable'              : 1,
             \ 'g:neco_source_google_suggest_language'             : 'en',
             \})
 
@@ -12,11 +12,9 @@ call zlib#rc#set_default({
 
 fun! s:source.initialize()
     call neocomplcache#set_completion_length('google_suggest', 3)
+    let g:neocomplcache_source_disable['google_suggest'] = g:neco_source_google_suggest_disable
 
-    command! NeoComplCacheToggleGoogleSuggest
-                \   let g:neco_source_google_suggest_enable = !g:neco_source_google_suggest_enable
-                \ | let status = g:neco_source_google_suggest_enable ? 'on' : 'off'
-                \ | echo "Google Suggest: " . status
+    command! NeoComplCacheToggleGoogleSuggest call s:toggle()
 endf
 
 fun! s:source.finalize()
@@ -24,7 +22,7 @@ fun! s:source.finalize()
 endf
 
 fun! s:source.get_keyword_list(cur_keyword_str)
-    if !g:neco_source_google_suggest_enable
+    if g:neco_source_google_suggest_disable
         return []
     endif
     return map(s:get_google_suggest(a:cur_keyword_str, g:neco_source_google_suggest_language),
@@ -33,6 +31,15 @@ endf
 
 fun! neocomplcache#sources#google_suggest#define()
     return s:source
+endf
+
+fun! s:toggle()
+    let g:neco_source_google_suggest_disable = !g:neco_source_google_suggest_disable
+
+    let g:neocomplcache_source_disable['google_suggest'] = g:neco_source_google_suggest_disable
+
+    let status = g:neco_source_google_suggest_disable ? 'off' : 'on'
+    echo "Google Suggest: " . status
 endf
 
 fun! s:get_google_suggest(cur_keyword_str, language)
