@@ -3,7 +3,7 @@ let s:source = {
             \ 'kind': 'plugin',
             \ }
 
-call zlib#rc#set_default({
+call zl#rc#set_default({
             \ 'g:neco_source_google_suggest_disable'              : 1,
             \ 'g:neco_source_google_suggest_language'             : 'en',
             \})
@@ -15,7 +15,7 @@ function! s:source.initialize()
 
     " Set rank.
     call neocomplcache#set_dictionary_helper(g:neocomplcache_source_rank,
-          \ 'google_suggest', 10)
+          \ 'google_suggest', 3)
 
     let g:neocomplcache_source_disable['google_suggest'] = g:neco_source_google_suggest_disable
 
@@ -24,6 +24,8 @@ endfunction
 
 function! s:source.finalize()
     delcommand NeoComplCacheToggleGoogleSuggest
+
+    let s:source = {}
 endfunction
 
 function! s:source.get_keyword_list(cur_keyword_str)
@@ -52,12 +54,12 @@ function! s:get_google_suggest(cur_keyword_str, language)
     let res = webapi#http#get(
                 \ 'http://suggestqueries.google.com/complete/search',
                 \ {
-                    \ "client" : "youtube",
-                    \ "q" : a:cur_keyword_str,
-                    \ "hjson" : "t",
-                    \ "hl" : a:language,
-                    \ "ie" : "UTF8",
-                    \ "oe" : "UTF8"
+                    \ "client" : "youtube"         ,
+                    \ "q"      : a:cur_keyword_str ,
+                    \ "hjson"  : "t"               ,
+                    \ "hl"     : a:language        ,
+                    \ "ie"     : "UTF8"            ,
+                    \ "oe"     : "UTF8"
                 \ }
             \ )
     let arr = webapi#json#decode(res.content)
